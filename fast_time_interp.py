@@ -135,10 +135,10 @@ def plot_edens(sat, nature):
     plt.figure(figsize=(12,8))
     
     for s, c, l in zip(sat, color, label):
-        plt.plot(s['mlat'], s[nature], color=c, label=l)
+        plt.plot(s['glat'], s[nature], color=c, label=l)
         
     plt.legend(title='Satellite passes', loc = 'upper left')
-    plt.xlabel('Magnetic Latitude MLAT')
+    plt.xlabel('GLAT')
     plt.ylabel(nature)
     plt.title('Comparison Plots for Quiet and Storm Time Satellite Passes')
     plt.show()
