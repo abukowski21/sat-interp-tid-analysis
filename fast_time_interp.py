@@ -103,6 +103,7 @@ def magnetic_coords(sat_data):
     glon = sat_data.glon.values
     alt = sat_data.alt.values
     gtime = sat_data.sat_time.values
+    '''
     args = zip(glat, glon, alt, gtime)
 
     with Pool(30) as pool:
@@ -110,6 +111,15 @@ def magnetic_coords(sat_data):
         mag_coords = pool.map(geo_to_mag_coord, args)
     
     mlat, mlon = mag_coords
+    '''
+    n = len(glat)
+    mlat = np.zeros(n)
+    mlon = np.zeros(n)
+    
+    for i in tqdm(range(n)):
+        geo_coord = [glat[i], glon[i], alt[i], gtime[i]]
+        m_coord = geo_to_mag_coord(geo_coord)    
+        mlat[i], mlon[i] = m_coord
     
     sat_data['mlat'] = ('sat_step', mlat)
     sat_data['mlon'] = ('sat_step', mlon)
