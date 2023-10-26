@@ -35,7 +35,7 @@ def ab_filt_filt(da,
               freq=5,
               lims=[45, 80],
               order=1,
-              percent=True):
+              xarray=True):
 
     # Define sampling frequency and limits in minutes
     sampling_freq = freq
@@ -57,11 +57,10 @@ def ab_filt_filt(da,
     filtd = np.array(filtfilt(b, a, da, axis=0))
     # filtd = xr.apply_ufunc(filtfilt, b, a, da, dask='allowed')
 
-    if percent:
-        return (100*(filtd)/da)
-
+    if xarray:
+        return filtd, (100*(filtd)/da.values)
     else:
-        return filtd
+        return filtd, (100*(filtd)/da)
 
 
 def filt_filt(da,
@@ -74,7 +73,7 @@ def filt_filt(da,
     # lower_cutoff = 2*lower_lim/sampling_freq
     lower, upper = lims
     nyquist_rate = 0.5*sampling_freq
-    print('lower limit =', 1/upper, ', upper limit =', 1/lower)
+    #print('lower limit =', 1/upper, ', upper limit =', 1/lower)
     
     # 1/lower will give the upper-frequency limit of bandpass and vice versa
     b, a = butter(order, [1/upper, 1/lower],
