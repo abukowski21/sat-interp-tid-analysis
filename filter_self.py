@@ -13,8 +13,6 @@ import math
 
 from scipy.signal import butter, sosfiltfilt, sosfilt_zi, sosfilt, lfilter, filtfilt, savgol_filter, wiener, order_filter
 from numpy.polynomial import Chebyshev
-from moepy import lowess
-from statsmodels.nonparametric.kernel_regression import KernelReg
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.fft import fft
@@ -165,6 +163,7 @@ def best_filters(x,y):
     '''
 
     # LOWESS Filter
+    from moepy import lowess
     lowess_m = lowess.Lowess()
     lowess_m.fit(x,y,0.17)
     yf = lowess_m.predict(x)
