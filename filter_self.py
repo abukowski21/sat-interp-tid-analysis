@@ -10,9 +10,6 @@ import importlib as il
 from tqdm import tqdm
 from pandas import DataFrame
 import math
-import pyIGRF as pyigrf
-import apexpy
-from apexpy import Apex
 
 from scipy.signal import butter, sosfiltfilt, sosfilt_zi, sosfilt, lfilter, filtfilt, savgol_filter, wiener, order_filter
 from numpy.polynomial import Chebyshev
