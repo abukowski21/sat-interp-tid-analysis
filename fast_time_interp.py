@@ -127,30 +127,24 @@ def magnetic_coords(sat_data):
     return sat_data
 
 
-def plot_edens(sat, nature):
+def plot_edens(sat, names, nature):
     '''
     Plotting the characteristic given by the 'nature' variable for 6 
     different satellite passes. sat variable is having the data of 6
     satellite passes.
     '''
     
-    # Plotting the edens on single plot. Variable is a string defining the data variable being plotted against mlat
-    if len(sat) != 6:
-        print('Error - Number of satellites in sat variable should be 6.\n')
-        return
-    
-    color = ['black', 'purple', 'blue', 'yellow', 'orange', 'red']
-    label = ['quiet 00:20 UTC', 'quiet 02:02 UTC', 'quiet 03:44 UTC', 'storm 15:39 UTC', 'storm 17:19 UTC', 'storm 19:01 UTC']
-
-    plt.figure(figsize=(12,8))
-    
-    for s, c, l in zip(sat, color, label):
-        plt.plot(s['glat'], s[nature], color=c, label=l)
+    for i in range(6):
         
-    plt.legend(title='Satellite passes', loc = 'upper left')
-    plt.xlabel('GLAT')
-    plt.ylabel(nature)
-    plt.title('Comparison Plots for Quiet and Storm Time Satellite Passes')
-    plt.show()
+        plt.figure()
+        color = ['black', 'purple', 'blue', 'green', 'yellow', 'orange', 'red']
+        for s, l, c in zip(sat[7*i:7*(i+1)], names[7*i:7*(i+1)], color):
+            plt.plot(s['glat'], s[nature], label=l, color=c)
+            
+        plt.legend(title='Satellite passes')
+        plt.xlabel('GLAT')
+        plt.ylabel(nature)
+        plt.title('Different Satellite Passes')
+        plt.show()
 
     return
