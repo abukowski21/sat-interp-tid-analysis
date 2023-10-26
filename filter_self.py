@@ -24,7 +24,7 @@ from scipy.fft import fft
 from scipy.fft import fftfreq
 
 
-def FFT(y, sampling_freq):
+def FFT(y, sampling_freq=1):
     
     fourier = 2*fft(y)/len(y) # 2/len(y) is for normalization
     freq_axis = fftfreq(len(y), d=1.0/sampling_freq) # No need for Nyquist rate here
@@ -33,7 +33,7 @@ def FFT(y, sampling_freq):
 
 def ab_filt_filt(da,
               freq=5,
-              lims=[40, 85],
+              lims=[45, 80],
               order=1,
               percent=True):
 
@@ -54,27 +54,27 @@ def ab_filt_filt(da,
                   btype='band', analog=False)
 
     # Apply the filter to the data
-    filtd = filtfilt(b, a, da, axis=0)
+    filtd = np.array(filtfilt(b, a, da, axis=0))
     # filtd = xr.apply_ufunc(filtfilt, b, a, da, dask='allowed')
 
     if percent:
         return (100*(filtd)/da)
 
     else:
-        #da.values = filtd
-        return da
+        return filtd
 
 
 def filt_filt(da,
               sampling_freq=1,
               lims= [150, 300], #[0.0075, 0.02], #[0.0033, 0.0066],
-              order=1):
+              order=1,
+              xarray=True):
     
     # Design the bandpass filter
     # lower_cutoff = 2*lower_lim/sampling_freq
     lower, upper = lims
     nyquist_rate = 0.5*sampling_freq
-    print('lower', 1/upper, 'upper', 1/lower)
+    print('lower limit =', 1/upper, ', upper limit =', 1/lower)
     
     # 1/lower will give the upper-frequency limit of bandpass and vice versa
     b, a = butter(order, [1/upper, 1/lower],
@@ -83,8 +83,10 @@ def filt_filt(da,
     # Apply the filter to the data
     filtd = filtfilt(b, a, da, axis=0)
 
-    return filtd, (100*(filtd)/da)
-
+    if xarray:
+        return filtd, (100*(filtd)/da.values)
+    else:
+        return filtd, (100*(filtd)/da)
 
 def polyfitting(degree, x, y):
     '''
