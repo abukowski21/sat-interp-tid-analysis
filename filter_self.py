@@ -10,9 +10,14 @@ import importlib as il
 from tqdm import tqdm
 from pandas import DataFrame
 import math
+import pyIGRF as pyigrf
+import apexpy
+from apexpy import Apex
 
 from scipy.signal import butter, sosfiltfilt, sosfilt_zi, sosfilt, lfilter, filtfilt, savgol_filter, wiener, order_filter
 from numpy.polynomial import Chebyshev
+from moepy import lowess
+from statsmodels.nonparametric.kernel_regression import KernelReg
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.fft import fft
@@ -26,38 +31,78 @@ def FFT(y, sampling_freq=1):
     
     return fourier, freq_axis
 
-def ab_filt_filt(da,
-              freq=5,
+
+def filt_filt(da,
+              freq=1/5,
               lims=[45, 80],
               order=1,
-              xarray=True):
+              xarray=True
+    ):
+    """
+    Passing the Signal through a Band Pass Filter (BPF)
 
-    # Define sampling frequency and limits in minutes
-    sampling_freq = freq
-    lower_limit = min(lims)
-    upper_limit = max(lims)
+    Parameters
+    ----------
 
-    # Convert limits to corresponding indices
-    lower_index = int(lower_limit / sampling_freq)
-    upper_index = int(upper_limit / sampling_freq)
+    da : array_like or xarray dataset
+        Data that needs to be filtered
+    freq : float, optional
+        Frequency of data collection (inverse of time taken to collect 
+        two consecutive data). Default is 1/5.
 
-    # Design the bandpass filter
-    nyquist_freq = 0.5 * sampling_freq
-    lower_cutoff = lower_index / nyquist_freq
-    upper_cutoff = upper_index / nyquist_freq
-    b, a = butter(order, [1/upper_cutoff, 1/lower_cutoff],
-                  btype='band', analog=False)
+        Example - for 1-second satellite data, `freq` = 1/1 sec^-1,
+        similarly, for 5-minute satellite data, `freq` = 1/5 min^-1.
+    lims : array_like, optional
+        Critical time periods (or inverse of critical frequencies) 
+        that contains the region that BPF will allow. The regions
+        outside the lims will undergo perturbations. `lims` is a 
+        length-2 sequence and its units should be similar to `freq`.
 
-    # Apply the filter to the data
-    filtd = np.array(filtfilt(b, a, da, axis=0))
-    # filtd = xr.apply_ufunc(filtfilt, b, a, da, dask='allowed')
+        Example - to filter the signals of period 150 to 300 seconds
+        out of 1-second satellite data, lims = [150, 300], similarly,
+        to filter the signal of period 45 to 80 minutes out of 
+        5-minute satellite data, lims = [45, 80].
+    order : int, optional
+        Order of the Butterworth filter. Default is 1.
+    xarray : bool, optional
+        False if `da` is array_like , True is `da` is xarray dataset.
+        Default is True.
+
+    Returns
+    -------
+    filtd : np.array
+        Filtered data
+    filtd_perc : np.array
+        Element-wise percentage difference from `da` data
+    """
 
     if xarray:
-        return filtd, (100*(filtd)/da.values)
+        data = np.array(da.values)
     else:
-        return filtd, (100*(filtd)/da)
+        data = da
 
+    # Defining critical frequencies as Wn
+    lower_limit, upper_limit = lims
+    Wn = np.array([1/upper_limit, 1/lower_limit])
+    
+    # Defining Nyquist rate
+    nyquist_freq = 0.5*freq
 
+    # Normalizing critical frequencies with Nyquist Rate: 
+    Wn = Wn/nyquist_freq
+    print(Wn)
+
+    # Applying the Butterworth function to get Numerator (a) and
+    # denominator (b) polynomials of IIR filter
+    b, a = butter(order, Wn, btype='band', analog=False)
+
+    # Passing b, a to filtfilt function to get filtered data
+    filtd = np.array(filtfilt(b, a, data, axis=0))
+    filtd_perc = np.array(100*(filtd)/data)
+
+    return filtd, filtd_perc
+
+'''
 def filt_filt(da,
               sampling_freq=1,
               lims= [150, 300], #[0.0075, 0.02], #[0.0033, 0.0066],
@@ -67,12 +112,10 @@ def filt_filt(da,
     # Design the bandpass filter
     # lower_cutoff = 2*lower_lim/sampling_freq
     lower, upper = lims
-    nyquist_rate = 0.5*sampling_freq
-    #print('lower limit =', 1/upper, ', upper limit =', 1/lower)
-    
-    # 1/lower will give the upper-frequency limit of bandpass and vice versa
+    #nyquist_rate = 0.5*sampling_freq
+        
     b, a = butter(order, [1/upper, 1/lower],
-                  btype='band', analog=False, fs=nyquist_rate)
+                  btype='band', analog=False, fs=sampling_freq)
     
     # Apply the filter to the data
     filtd = filtfilt(b, a, da, axis=0)
@@ -81,6 +124,7 @@ def filt_filt(da,
         return filtd, (100*(filtd)/da.values)
     else:
         return filtd, (100*(filtd)/da)
+'''
 
 def polyfitting(degree, x, y):
     '''
@@ -163,7 +207,6 @@ def best_filters(x,y):
     '''
 
     # LOWESS Filter
-    from moepy import lowess
     lowess_m = lowess.Lowess()
     lowess_m.fit(x,y,0.17)
     yf = lowess_m.predict(x)
