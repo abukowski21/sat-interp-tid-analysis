@@ -171,7 +171,7 @@ def best_filters(x,y):
     '''
 
     # Savitzky-Golay filter
-    yf = savgol_filter(y, 500, 4)
+    yf = savgol_filter(y, 500, 3)
     yfit.append(yf)
     name.append('Savgol Filter')
 
