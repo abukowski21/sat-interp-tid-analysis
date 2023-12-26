@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.fft import fft
 from scipy.fft import fftfreq
+import pytz
+from timezonefinder import TimezoneFinder
 
 
 def FFT(y, sampling_freq=1):
@@ -30,7 +32,7 @@ def FFT(y, sampling_freq=1):
     freq_axis = fftfreq(len(y), d=1.0/sampling_freq) # No need for Nyquist rate here
     
     return fourier, freq_axis
-
+    
 
 def filt_filt(da,
               freq=1/5,
@@ -102,29 +104,113 @@ def filt_filt(da,
 
     return filtd, filtd_perc
 
-'''
-def filt_filt(da,
-              sampling_freq=1,
-              lims= [150, 300], #[0.0075, 0.02], #[0.0033, 0.0066],
-              order=1,
-              xarray=True):
-    
-    # Design the bandpass filter
-    # lower_cutoff = 2*lower_lim/sampling_freq
-    lower, upper = lims
-    #nyquist_rate = 0.5*sampling_freq
-        
-    b, a = butter(order, [1/upper, 1/lower],
-                  btype='band', analog=False, fs=sampling_freq)
-    
-    # Apply the filter to the data
-    filtd = filtfilt(b, a, da, axis=0)
 
-    if xarray:
-        return filtd, (100*(filtd)/da.values)
+# Convert UTC to Local Time (Aaron's function)
+def ut_to_lt(time_array, glon):
+    """
+    Compute local time from date and longitude.
+
+    Parameters
+    ----------
+    time_array : array-like
+        Array-like of datetime objects in universal time
+    glon : array-like or float
+        Float or array-like of floats containing geographic longitude
+        in degrees. If single value or array of a different shape, all
+        longitudes are applied to all times. If the shape is the same as
+        `time_array`, the values are paired in the SLT calculation.
+
+    Returns
+    -------
+    array of floats
+        List of local times in hours
+    """
+
+    time_array = np.asarray(time_array)
+    glon = np.asarray(glon)
+
+    # Get UT seconds of day
+    try:  # if numpy timestamps
+        utsec = [(ut.hour * 3600.0 + ut.minute * 60.0 + ut.second
+                  + ut.microsecond * 1.0e-6) / 3600.0 for ut in time_array]
+    except BaseException:
+        utsec = []
+        for ut in time_array:
+            ut = pd.Timestamp(ut)
+            utsec.append((ut.hour * 3600.0 + ut.minute * 60.0 + ut.second
+                          + ut.microsecond * 1.0e-6) / 3600.0)
+    # Determine if the calculation is paired or broadcasted
+    if glon.shape == time_array.shape:
+        lt = np.array([utime + glon[i] / 15.0 for i,
+                      utime in enumerate(utsec)])
     else:
-        return filtd, (100*(filtd)/da)
+        lt = np.array([utime + glon / 15.0 for utime in utsec])
+
+    # Adjust to ensure that 0.0 <= lt < 24.0
+    while np.any(lt < 0.0):
+        lt[lt < 0.0] += 24.0
+
+    while np.any(lt >= 24.0):
+        lt[lt >= 24.0] -= 24.0
+    
+    return lt
+
 '''
+# Filter using FFT and then IFFT
+
+def test_filt_filt(da,
+              freq=1/5,
+              lims=[45, 80],
+              xarray=True,
+              dimensions=1,
+              size = 0
+    ):
+    print('yes')
+    if xarray:
+        data = np.array(da.values)
+    else:
+        data = da
+
+    
+    if dimensions == 2:
+       
+        print(len(data), len(data[0]), data[288][179], size, 'size comp')
+        
+        size2 = len(data[0])
+        y = np.zeros([size, size2])
+        y_perc = np.zeros([size, size2])
+        
+        num = 0
+        
+        for i in range(size2):
+            d = np.zeros(size)
+            for j in range(size):
+                d[j] = data[j][i]
+            fourier = np.fft.fft(d)
+            freq_ax = np.fft.fftfreq(size, 1)
+
+            Wn = [1.0/(freq*lims[1]), 1.0/(freq*lims[0])]
+            fourier[np.where(np.logical_or(np.abs(freq_ax) < Wn[0], np.abs(freq_ax) > Wn[1]))] = 0
+            y_iter = (np.fft.ifft(fourier)).real
+            for j in range(size):
+                y[j][i] = y_iter[j]
+                y_perc[j][i] = 100*y[j][i]/d[j]
+        return y, y_perc
+        
+    else:
+        fourier = np.fft.fft(data)
+        plt.plot(data)
+        plt.show()
+        freq_ax = np.fft.fftfreq(len(data), 1/freq)
+        Wn = [1.0/(lims[1]), 1.0/(lims[0])]
+        fourier[np.where(np.logical_or(np.abs(freq_ax) < Wn[0], np.abs(freq_ax) > Wn[1]))] = 0
+        y = (np.fft.ifft(fourier)).real
+        y_perc = [100*i/j for i, j in zip(y, data)]
+        print(np.min(y_perc), np.max(y_perc))
+    
+        return y, y_perc
+'''
+
 
 def polyfitting(degree, x, y):
     '''

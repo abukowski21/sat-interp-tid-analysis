@@ -99,8 +99,8 @@ def magnetic_coords(sat_data):
     positions and add them in the satellite xarray variable
     '''
 
-    glat = sat_data.glat.values
-    glon = sat_data.glon.values
+    glat = sat_data.lat.values
+    glon = sat_data.lon.values
     alt = sat_data.alt.values
     gtime = sat_data.sat_time.values
     '''
@@ -139,7 +139,7 @@ def plot_edens(sat, names, nature):
         plt.figure()
         color = ['black', 'purple', 'blue', 'green', 'yellow', 'orange', 'red']
         for s, l, c in zip(sat[7*i:7*(i+1)], names[7*i:7*(i+1)], color):
-            plt.plot(s['glat'], s[nature], label=l, color=c)
+            plt.plot(s['lat'], s[nature], label=l, color=c)
             
         plt.legend(title='Satellite passes')
         plt.xlabel('GLAT')
