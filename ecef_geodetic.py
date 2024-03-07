@@ -1,4 +1,4 @@
-from geopy.distance import geodesic
+
 import math
 import numpy as np
 
