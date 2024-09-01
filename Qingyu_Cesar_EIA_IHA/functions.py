@@ -48,3 +48,11 @@ def magnetic_coords(sat_data, apex):
     return sat_data
 
 
+def magnetic_coords_parallel(sat_date, sat_glat, sat_glon, apex):
+    gtime = sat_date
+    mlat, mlon = [apex.convert(sat_glat, sat_glon, 'geo', 'apex')]
+    mlt = apex.mlon2mlt(mlon, gtime)
+    
+    return [sat_date, sat_glat, mlat, mlon, mlt]
+
+
