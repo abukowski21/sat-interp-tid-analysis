@@ -36,23 +36,15 @@ def kp_index_filtering(sat_data, kp):
     return filtered_data
 
 
-
-def magnetic_coords(sat_data, apex):
-    gtime = np.array(sat_data.DT)
-    mlat, mlon = zip(*[apex.convert(i, j, 'geo', 'apex') for i, j in tqdm(zip(sat_data['GDLAT'], sat_data['GLON']))])
-    mlt = apex.mlon2mlt(np.array(mlon), gtime)
-    sat_data['MLAT'] = list(mlat)
-    sat_data['MLON'] = list(mlon)
-    sat_data['MLT'] = mlt
-    
-    return sat_data
-
-
-def magnetic_coords_parallel(sat_date, sat_glat, sat_glon, apex):
+def magnetic_coords_parallel(sat_date, sat_glat, sat_glon, sat_tec):
     gtime = sat_date
-    mlat, mlon = [apex.convert(sat_glat, sat_glon, 'geo', 'apex')]
+    decimal_year = gtime.year + ((gtime - dt.datetime(gtime.year, 1, 1)).days) / 365.25
+    apex = Apex(decimal_year)
+    
+    mlat, mlon = apex.convert(sat_glat, sat_glon, 'geo', 'apex')
     mlt = apex.mlon2mlt(mlon, gtime)
     
-    return [sat_date, sat_glat, mlat, mlon, mlt]
+    return [sat_date, sat_glat, sat_glon, sat_tec, mlat, mlon, mlt]
+
 
 
