@@ -1,19 +1,10 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import xarray as xr
-
-import cartopy.crs as ccrs
-from tqdm import tqdm
 from apexpy import Apex
-import os
 import datetime as dt
 
-import sys
-sys.path.append('../')
-sys.path.append('/home/pxv220016/prasoon/data/sat_interp_repo/repo2/prasoon_utility_programs')
 
-
+# FUNCTIONS DEFINITION
 
 def day_to_date(day, year):
     leap = (year % 4 == 0) & ((year % 100 != 0) | (year % 400 == 0))
