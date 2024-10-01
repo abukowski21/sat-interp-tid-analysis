@@ -19,7 +19,7 @@ def day_to_date(day, year):
 def kp_index_filtering(sat_data, kp):
     # Here sat_data and kp are both dataframes
     # Kp values corresponding to date in sat_data is being stored in column of sat_data
-    merged_data = pd.merge_asof(sat_data.sort_values('DT'), kp, left_on='DT', right_on='date', direction='backward')
+    merged_data = pd.merge_asof(sat_data.sort_values('DT'), kp.sort_values('date'), left_on='DT', right_on='date', direction='backward')
 
     # Filter rows where 'kp' is less than 3
     filtered_data = merged_data[merged_data['kp'] <= 3].reset_index(drop=True)
