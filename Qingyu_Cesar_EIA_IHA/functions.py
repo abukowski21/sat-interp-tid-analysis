@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from apexpy import Apex
 import datetime as dt
 
 
