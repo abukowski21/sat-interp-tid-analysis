@@ -27,6 +27,10 @@ def kp_index_filtering(sat_data, kp):
 
 
 def magnetic_coords_parallel(sat_date, sat_glat, sat_glon, sat_tec):
+
+    # Putting it here as apexpy can't be installed in conda env
+    from apexpy import Apex
+    
     gtime = sat_date
     decimal_year = gtime.year + ((gtime - dt.datetime(gtime.year, 1, 1)).days) / 365.25
     apex = Apex(decimal_year)
