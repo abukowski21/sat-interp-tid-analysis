@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Ignore specific folder
+Qingyu_Cesar_EIA_IHA/Miniconda3-latest-MacOSX-x86_64.sh
+scratch/
+.DS_Store
+
 # C extensions
 *.so
 
