@@ -41,4 +41,3 @@ def magnetic_coords_parallel(sat_date, sat_glat, sat_glon, sat_tec):
     return [sat_date, sat_glat, sat_glon, sat_tec, mlat, mlon, mlt]
 
 
-

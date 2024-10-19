@@ -23,13 +23,14 @@ for year in {2000..2024}; do
             phase="solstice"
         fi
 
+        
         # Create the directory structure
-        mkdir -p "/Users/prasoonv/repo/sat-interp-tid-analysis/scratch/Qingyu_Cesar_EIA/${month}_data"
-        mkdir -p "/Users/prasoonv/repo/sat-interp-tid-analysis/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}"
+        mkdir -p "/home/pxv220016/scratch/Qingyu_Cesar_EIA/${month}_data"
+        mkdir -p "/home/pxv220016/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}"
 
         # Run the globalDownload.py script with the specified dates
         globalDownload.py --verbose --url="http://cedar.openmadrigal.org" \
-                          --outputDir="/Users/prasoonv/repo/sat-interp-tid-analysis/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}" \
+                          --outputDir="/home/pxv220016/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}" \
                           --user_fullname="Prasoon" \
                           --user_email="pxv220016@utdallas.edu" \
                           --user_affiliation="None" \
@@ -40,7 +41,7 @@ for year in {2000..2024}; do
                           --kindat=3500 
 
         # Unzip downloaded files in the output directory
-        gunzip "/Users/prasoonv/repo/sat-interp-tid-analysis/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}/gps*gz"
-
+        gunzip"/home/pxv220016/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}/gps*gz"
+        
     done
 done
