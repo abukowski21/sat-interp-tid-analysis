@@ -35,7 +35,7 @@ else:
     phase = 'solstice'
 
 if month == 'dec':
-    years_tot = list(range(2016, 2024))
+    years_tot = list(range(2015, 2024))
 else:
     years_tot = list(range(2021, 2025))
     
@@ -100,7 +100,7 @@ for year in tqdm(years_tot):
 
     # Calculation of magnetic coordinates by using Apex library and Parallel prcoessing 
     t_start = dt.datetime.now() # just a timer
-    with Pool(60) as pool:
+    with Pool(40) as pool:
         p = pool.starmap(functions.magnetic_coords_parallel, zip(grnd_tec0.DT, grnd_tec0.GDLAT, grnd_tec0.GLON, grnd_tec0.TEC))
     pool.close()
     pool.join()

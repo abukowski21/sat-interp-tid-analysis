@@ -12,6 +12,8 @@ def day_to_date(day, year):
     while day - days_in_month[month] > 0:
         day = day - days_in_month[month]
         month += 1
+        if month == 12:
+            month = 0
     return month + 1, day
 
 
