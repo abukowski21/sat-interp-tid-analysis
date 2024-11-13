@@ -3,14 +3,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import xarray as xr
 
+import os
+import sys
+print("Current Conda environment:", os.environ.get("CONDA_DEFAULT_ENV"))
+
 import cartopy.crs as ccrs
 from tqdm import tqdm
 from apexpy import Apex
-import os
 import datetime as dt
 import importlib as il
 
-import sys
 sys.path.append('/home/pxv220016/prasoon/data/sat_interp_repo/repo2/prasoon_utility_programs')
 sys.path.append('/home/pxv220016/prasoon/data/sat_interp_repo/repo2/Qingyu_Cesar_EIA_IHA')
 import functions
@@ -27,7 +29,7 @@ work = '/home/pxv220016/prasoon/data/sat_interp_repo/repo2/'
 scratch = '/home/pxv220016/scratch/'
 
 functions = il.reload(functions)
-month = 'dec'
+month = 'march'
 
 if month == 'sept' or month == 'march':
     phase = 'equinox'
@@ -37,9 +39,14 @@ else:
 if month == 'dec':
     years_tot = list(range(2015, 2024))
 else:
-    years_tot = list(range(2021, 2025))
-    
-for year in tqdm(years_tot):
+    years_tot = list(range(2012, 2025))
+
+
+#start_index = int(sys.argv[1])
+#end_index = int(sys.argv[2])
+
+#for year in tqdm(start_index, end_index):
+for year in tqdm(start_index, years_tot):
     
     print(year)
 
