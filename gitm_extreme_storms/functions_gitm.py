@@ -30,4 +30,5 @@ def gitm_to_xarray(gitm_bin):
 
     # Create an xarray.Dataset with the data variables and coordinates
     ds = xr.Dataset(data_vars, coords=coords, attrs=attrs)
+    
     return ds
