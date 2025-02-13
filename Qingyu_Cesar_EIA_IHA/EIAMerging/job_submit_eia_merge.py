@@ -28,7 +28,10 @@ work = '/home/pxv220016/prasoon/data/sat_interp_repo/sat-interp-tid-analysis/'
 scratch = '/home/pxv220016/scratch/'
 
 functions = il.reload(functions)
-path = f'{scratch}Qingyu_Cesar_EIA/EIAmerging/tec_data/'
+
+events_list = ['feb_22_24_2023', 'may_9_11_2024']
+event = events_list[0]
+path = f'{scratch}Qingyu_Cesar_EIA/EIAmerging/tec_data/{event}/'
 files = os.listdir(path)
 files = [path + i for i in files]
 
@@ -72,7 +75,7 @@ grnd_tec0 = grnd_tec.sort_values(by=['DT', 'GDLAT'], ascending=[True, True])
 
 
 
-# Reading the Kp index values for all the days and filtering undesired points where Kp > 3
+# Reading the Kp, F10.7 index values for all the days and filtering undesired points where Kp > 3
 file = f'{scratch}Qingyu_Cesar_EIA/EIAmerging/kp_f107_data.txt'
 kp = pd.read_csv(file,sep=r'\s+')
 year = 2023
@@ -84,6 +87,19 @@ kp = kp.drop(['Year', 'Hour','Kp'], axis = 1)
 # the below command is messing up the kp values as it is trying to fit the kp value 
 # based on weighted average of all the known points surrounding it
 grnd_tec0 = pd.merge_asof(grnd_tec0.sort_values('DT'), kp.sort_values('DT'), on='DT', direction='nearest')
+
+
+# Reading the By, Bz index values for all the days
+file = f'{scratch}Qingyu_Cesar_EIA/EIAmerging/by_bz_data.txt'
+imf = pd.read_csv(file,sep=r'\s+')
+year = imf.Year[0]
+date_imf = [functions.day_to_date(i, year) for i in imf.DOY]
+m, d = zip(*date_imf)
+imf['DT'] = [dt.datetime(year, j, i, k, l, 0) for i,j,k,l in zip(d,m,imf.Hour,imf.Minute)]
+imf = imf.drop(['Year','Hour','Minute', 'DOY'], axis = 1)
+grnd_tec0 = pd.merge_asof(grnd_tec0.sort_values('DT'), imf.sort_values('DT'), on='DT', direction='nearest')
+
+
 #grnd_tec0 = merged_data.drop(['date'], axis = 1)
 print('2')
 
@@ -99,7 +115,7 @@ sat_date, sat_glat, sat_glon, sat_tec, sat_mlat, sat_mlon, sat_mlt = zip(*p)
 
 
 # Reordering the outputs and applying further conditions on magnetic coordinates
-grnd_temp = pd.DataFrame({'DT': sat_date, 'DOY': grnd_tec0.DOY, 'GDLAT': sat_glat, 'GLON': sat_glon, 'TEC': sat_tec, 'MLAT': sat_mlat, 'MLON': sat_mlon, 'MLT': sat_mlt, 'kp':grnd_tec0.kp, 'F10.7':grnd_tec0['F10.7']})
+grnd_temp = pd.DataFrame({'DT': sat_date, 'DOY': grnd_tec0.DOY, 'GDLAT': sat_glat, 'GLON': sat_glon, 'TEC': sat_tec, 'MLAT': sat_mlat, 'MLON': sat_mlon, 'MLT': sat_mlt, 'kp':grnd_tec0.kp, 'By':grnd_tec0.BY, 'Bz':grnd_tec0.BZ, 'F10.7':grnd_tec0['F10.7']})
 grnd_tec1 = grnd_temp.sort_values(by=['DT', 'GDLAT'], ascending=[True, True]).reset_index()
 grnd_tec1 = grnd_tec1[(grnd_tec1.MLON <= mlon_max) & (grnd_tec1.MLON >= mlon_min)].reset_index(drop=True)
 grnd_tec1 = grnd_tec1[(grnd_tec1.MLAT <= 40) & (grnd_tec1.MLAT >= -40)].reset_index(drop=True)
@@ -109,7 +125,7 @@ grnd_tec2 = grnd_tec1.drop(['GDLAT', 'GLON','MLON'], axis = 1)
 
 
 # Writing the output into csv files for easy post processing
-grnd_tec2.to_csv(f'{scratch}Qingyu_Cesar_EIA/EIAmerging/feb_22_24_2023.csv', index=False)
+grnd_tec2.to_csv(f'{scratch}Qingyu_Cesar_EIA/EIAmerging/{event}.csv', index=False)
 
 t_total = dt.datetime.now() - t_start
 print(t_total)
