@@ -39,7 +39,11 @@ def magnetic_coords_parallel(sat_date, sat_glat, sat_glon, sat_tec):
     
     mlat, mlon = apex.convert(sat_glat, sat_glon, 'geo', 'apex')
     mlt = apex.mlon2mlt(mlon, gtime)
+
+    # Calculate Local Time (solar-based)
+    lt_hours = (gtime.hour + gtime.minute/60 + gtime.second/3600 + sat_glon / 15.0) % 24
+    lt = (gtime + dt.timedelta(hours=(sat_glon / 15.0))).time()
     
-    return [sat_date, sat_glat, sat_glon, sat_tec, mlat, mlon, mlt]
+    return [sat_date, sat_glat, sat_glon, sat_tec, lt_hours, mlat, mlon, mlt]
 
 

@@ -45,10 +45,10 @@ print('No. of files to process:', len(files))
 
 glat_lim = 40
 
-glon_min = -60
-glon_max = -40
-mlon_min = 15
-mlon_max = 25
+glon_min = -75
+glon_max = -55
+#mlon_min = 15
+#mlon_max = 25
 zone_mlon = '20E'
 
     
@@ -110,22 +110,23 @@ with Pool(40) as pool:
 pool.close()
 pool.join()
 # Separating the data from output list 
-sat_date, sat_glat, sat_glon, sat_tec, sat_mlat, sat_mlon, sat_mlt = zip(*p)
+sat_date, sat_glat, sat_glon, sat_tec, sat_lt, sat_mlat, sat_mlon, sat_mlt = zip(*p)
 
 
 
 # Reordering the outputs and applying further conditions on magnetic coordinates
-grnd_temp = pd.DataFrame({'DT': sat_date, 'DOY': grnd_tec0.DOY, 'GDLAT': sat_glat, 'GLON': sat_glon, 'TEC': sat_tec, 'MLAT': sat_mlat, 'MLON': sat_mlon, 'MLT': sat_mlt, 'kp':grnd_tec0.kp, 'By':grnd_tec0.BY, 'Bz':grnd_tec0.BZ, 'F10.7':grnd_tec0['F10.7']})
+grnd_temp = pd.DataFrame({'DT': sat_date, 'DOY': grnd_tec0.DOY, 'GDLAT': sat_glat, 'GLON': sat_glon, 'LT': sat_lt, 'TEC': sat_tec, 'MLAT': sat_mlat, 'MLON': sat_mlon, 'MLT': sat_mlt, 'kp':grnd_tec0.kp, 'By':grnd_tec0.BY, 'Bz':grnd_tec0.BZ, 'F10.7':grnd_tec0['F10.7']})
 grnd_tec1 = grnd_temp.sort_values(by=['DT', 'GDLAT'], ascending=[True, True]).reset_index()
-grnd_tec1 = grnd_tec1[(grnd_tec1.MLON <= mlon_max) & (grnd_tec1.MLON >= mlon_min)].reset_index(drop=True)
-grnd_tec1 = grnd_tec1[(grnd_tec1.MLAT <= 40) & (grnd_tec1.MLAT >= -40)].reset_index(drop=True)
-grnd_tec2 = grnd_tec1.drop(['GDLAT', 'GLON','MLON'], axis = 1)
+#grnd_tec1 = grnd_tec1[(grnd_tec1.MLON <= mlon_max) & (grnd_tec1.MLON >= mlon_min)].reset_index(drop=True)
+grnd_tec1 = grnd_tec1[(grnd_tec1.GLON <= glon_max) & (grnd_tec1.GLON >= glon_min)].reset_index(drop=True)
+grnd_tec1 = grnd_tec1[(grnd_tec1.GDLAT <= 40) & (grnd_tec1.GDLAT >= -40)].reset_index(drop=True)
+#grnd_tec2 = grnd_tec1.drop(['GDLAT', 'GLON','MLON'], axis = 1)
 
 
 
 
 # Writing the output into csv files for easy post processing
-grnd_tec2.to_csv(f'{scratch}Qingyu_Cesar_EIA/EIAmerging/{event}.csv', index=False)
+grnd_tec1.to_csv(f'{scratch}Qingyu_Cesar_EIA/EIAmerging/{event}.csv', index=False)
 
 t_total = dt.datetime.now() - t_start
 print(t_total)
