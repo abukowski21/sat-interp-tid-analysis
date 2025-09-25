@@ -1,8 +1,8 @@
 #!/bin/bash
  
 # Loop over years from 2000 to 2023
-for year in {2000..2024}; do
-    for month in march sept june dec; do
+for year in 2013 2014 2015 2024; do  #{2000..2024}; do
+    for month in march sept; do # june dec; do
         
         # Set dates and phase based on the month
         if [ "$month" == "march" ]; then

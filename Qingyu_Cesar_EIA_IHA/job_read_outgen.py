@@ -54,16 +54,16 @@ for year in tqdm(list(range(start_index, end_index+1))):
   
     print(year)
 
-    glat_lim = 60
+    glat_lim = 40
 
     if zone == '75W':
         glon_min = -85
-        glon_max = -45
-        mlon_min = -5
-        mlon_max = 5
+        glon_max = -60
+        mlon_min = -10
+        mlon_max = 10
         zone_mlon = '0W'
     elif zone == '50W':
-        glon_min = -60
+        glon_min = -65
         glon_max = -40
         mlon_min = 15
         mlon_max = 25
@@ -73,7 +73,7 @@ for year in tqdm(list(range(start_index, end_index+1))):
     # Reading Madrigal Cedar data for +- 21 days around March equinox of 2010-2024
     # Files in below scratch folder are obtained by using multiple file download 
     # command in ASCII format and then doing `gunzip file.gz`  
-    path = f'{scratch}Qingyu_Cesar_EIA/' + month + '_data/' + str(year) + '_' + month + '_' + phase + '/'
+    path = f'{scratch}Qingyu_Cesar_EIA/{month}_data/{str(year)}_{month}_{phase}/'
     files = os.listdir(path)
     files = [path + i for i in files]
 
@@ -81,7 +81,7 @@ for year in tqdm(list(range(start_index, end_index+1))):
         if f[-4:] != '.txt':
             files.remove(f)
             
-    print('No. of files to process:', len(files))
+    #print('No. of files to process:', len(files))
     
     tec_g = []
     columns = ['GDLAT', 'GLON', 'TEC', 'DT']
