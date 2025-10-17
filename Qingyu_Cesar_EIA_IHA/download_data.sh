@@ -1,7 +1,7 @@
 #!/bin/bash
  
 # Loop over years from 2000 to 2023
-for year in 2013 2014 2015 2024; do  #{2000..2024}; do
+for year in 2013 2014 2015 2023 2024 2025; do  #{2000..2024}; do
     for month in march sept; do # june dec; do
         
         # Set dates and phase based on the month
@@ -25,12 +25,12 @@ for year in 2013 2014 2015 2024; do  #{2000..2024}; do
 
         
         # Create the directory structure
-        mkdir -p "/home/pxv220016/scratch/Qingyu_Cesar_EIA/${month}_data"
-        mkdir -p "/home/pxv220016/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}"
+        mkdir -p "/glade/work/prasoonv/scratch/Qingyu_Cesar_EIA/${month}_data"
+        mkdir -p "/glade/work/prasoonv/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}"
 
         # Run the globalDownload.py script with the specified dates
         globalDownload.py --verbose --url="http://cedar.openmadrigal.org" \
-                          --outputDir="/home/pxv220016/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}" \
+                          --outputDir="/glade/work/prasoonv/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}" \
                           --user_fullname="Prasoon" \
                           --user_email="pxv220016@utdallas.edu" \
                           --user_affiliation="None" \
@@ -41,7 +41,7 @@ for year in 2013 2014 2015 2024; do  #{2000..2024}; do
                           --kindat=3500 
 
         # Unzip downloaded files in the output directory
-        gunzip"/home/pxv220016/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}/gps*gz"
+        gunzip"/glade/work/prasoonv/sat-interp-tid-analysis/scratch/Qingyu_Cesar_EIA/${month}_data/${year}_${month}_${phase}/gps*gz"
         
     done
 done

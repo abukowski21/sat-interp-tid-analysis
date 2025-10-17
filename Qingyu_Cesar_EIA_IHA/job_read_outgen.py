@@ -13,8 +13,8 @@ from apexpy import Apex
 import datetime as dt
 import importlib as il
 
-sys.path.append('/home/pxv220016/prasoon/data/sat_interp_repo/repo2/prasoon_utility_programs')
-sys.path.append('/home/pxv220016/prasoon/data/sat_interp_repo/repo2/Qingyu_Cesar_EIA_IHA')
+sys.path.append('/glade/work/prasoonv/sat-interp-tid-analysis/prasoon_utility_programs')
+sys.path.append('/glade/work/prasoonv/sat-interp-tid-analysis/Qingyu_Cesar_EIA_IHA')
 import functions
 
 
@@ -25,8 +25,8 @@ import itertools
 
 
 
-work = '/home/pxv220016/prasoon/data/sat_interp_repo/repo2/'
-scratch = '/home/pxv220016/scratch/'
+work = '/glade/work/prasoonv/sat-interp-tid-analysis/'
+scratch = '/glade/work/prasoonv/scratch/'
 
 functions = il.reload(functions)
 start_index = int(sys.argv[1])
@@ -58,12 +58,12 @@ for year in tqdm(list(range(start_index, end_index+1))):
 
     if zone == '75W':
         glon_min = -85
-        glon_max = -60
-        mlon_min = -10
-        mlon_max = 10
+        glon_max = -45
+        mlon_min = -5
+        mlon_max = 5
         zone_mlon = '0W'
     elif zone == '50W':
-        glon_min = -65
+        glon_min = -60
         glon_max = -40
         mlon_min = 15
         mlon_max = 25
@@ -143,7 +143,7 @@ for year in tqdm(list(range(start_index, end_index+1))):
     
     grnd_tec1 = grnd_temp.sort_values(by=['DT', 'GDLAT'], ascending=[True, True]).reset_index()
     grnd_tec1 = grnd_tec1[(grnd_tec1.MLON <= mlon_max) & (grnd_tec1.MLON >= mlon_min)].reset_index(drop=True)
-    grnd_tec1 = grnd_tec1[(grnd_tec1.MLAT <= 40) & (grnd_tec1.MLAT >= -40)].reset_index(drop=True)
+    grnd_tec1 = grnd_tec1[(grnd_tec1.MLAT <= 30) & (grnd_tec1.MLAT >= -30)].reset_index(drop=True)
     grnd_tec2 = grnd_tec1.drop(['GDLAT', 'GLON','MLON'], axis = 1)
     print('grnd_tec2\n',grnd_tec2)
 
